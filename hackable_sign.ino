@@ -44,19 +44,20 @@ void update_display() {
     //set to null to signigy that memory has not been allocated
     static char *newStr = NULL;
 
-    if(tstStr1 != NULL) { //if memory is allocated, free memory before allocating more
-        free(tstStr1);
-        tstStr1 = NULL;
+    if(newStr != NULL) { //if memory is allocated, free memory before allocating more
+        free(newStr);
+        newStr = NULL;
+        Serial.println("Setting to null");
     }
     // Scroll the new text
     Serial.print("New text test: ");
-    Serial.println(tstStr1);
+    Serial.println(newStr);
 
     int strLen = server.arg("display").length()+1; //add 1 to include string null terminator
     newStr = (char*)malloc(strLen); //allocate needed memory for string
     memcpy(newStr, server.arg("display").c_str(), strLen); //copy string into allocated memory
 
-    display.displayScroll(tstStr1, PA_RIGHT, PA_SCROLL_LEFT, 50); //update display
+    display.displayScroll(newStr, PA_RIGHT, PA_SCROLL_LEFT, 50); //update display
 }
 
 
