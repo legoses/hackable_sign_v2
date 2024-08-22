@@ -7,12 +7,15 @@
 
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
 #define MAX_DEVICES 4
-//#define CS_PIN 14
-//#define DATA_PIN 27
-//#define CLK_PIN 12
 #define CS_PIN 5
 //clk connectes to pin 18
 //din connects to pin 23
+
+/*
+    TODO:
+    Check for memory leaks
+    Add functions to change scroll speed and text location
+*/
 
 MD_Parola display = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 
@@ -43,14 +46,20 @@ char* update_display() {
     Serial.println("Allocating memory for new display string");
     memcpy(newStr, server.arg("display").c_str(), strLen); //copy string into allocated memory
 
-    display.displayScroll(newStr, PA_RIGHT, PA_SCROLL_LEFT, 50); //update display
+    //display.displayScroll(newStr, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
     return newStr;
 }
 
 
-void update_effect() {
+int update_effect(const char *newStr) {
     Serial.println("Update effect place holder");
+    Serial.println(newStr);
+    int effectNum = server.arg("effect").toInt();
 
+    if(effectNum <= MAX_EFFECT) {
+        return effectNum;
+    }
+    return 17;
 }
 
 
@@ -59,12 +68,13 @@ void handle_connect() {
     //static keyword means this will keep its value while out of scope
     //this allows memory to be freed in later calls of this function
     static char *newStr = NULL;
+    static int lastEffect = 17; //default scroll effect
 
     if(!server.authenticate(http_username, http_password)) { //make sure user has logged in with username and password
         return server.requestAuthentication();
     }
 
-    if(server.hasArg("display")) {
+    if(server.args() > 0) {
         if(server.arg("display").length() > 0) {
             if(newStr != NULL) { //make sure memory is allocated before attempting to free
                 Serial.println("Freeing space of previous display string");
@@ -74,7 +84,17 @@ void handle_connect() {
             newStr = update_display();
         }
 
-        update_effect();
+        if(server.arg("effect") != "" && newStr != NULL) {
+            lastEffect = update_effect(newStr);
+        }
+       
+        if(newStr != NULL) {
+            display.displayScroll(newStr, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
+        }
+        else {
+            display.displayScroll("~~ Hack The Planet!!!!", PA_RIGHT, EFFECTS[lastEffect], 50); //update display
+        }
+
     }
 
     Serial.println("Sending webpage");
