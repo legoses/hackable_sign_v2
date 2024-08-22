@@ -34,43 +34,46 @@ void serve_page() {
 }
 
 
-void update_effect() {
-    Serial.println("Update effect placeholder");
-}
-
-
-void update_display() {
+char* update_display() {
+    char *newStr;
     display.displayClear(); // Clear the display
-    //set to null to signigy that memory has not been allocated
-    static char *newStr = NULL;
-
-    if(newStr != NULL) { //if memory is allocated, free memory before allocating more
-        free(newStr);
-        newStr = NULL;
-        Serial.println("Setting to null");
-    }
-    // Scroll the new text
-    Serial.print("New text test: ");
-    Serial.println(newStr);
 
     int strLen = server.arg("display").length()+1; //add 1 to include string null terminator
     newStr = (char*)malloc(strLen); //allocate needed memory for string
+    Serial.println("Allocating memory for new display string");
     memcpy(newStr, server.arg("display").c_str(), strLen); //copy string into allocated memory
 
     display.displayScroll(newStr, PA_RIGHT, PA_SCROLL_LEFT, 50); //update display
+    return newStr;
+}
+
+
+void update_effect() {
+    Serial.println("Update effect place holder");
+
 }
 
 
 void handle_connect() {
+    //set to null to signify that memory has not been allocated
+    //static keyword means this will keep its value while out of scope
+    //this allows memory to be freed in later calls of this function
+    static char *newStr = NULL;
+
     if(!server.authenticate(http_username, http_password)) { //make sure user has logged in with username and password
         return server.requestAuthentication();
     }
 
     if(server.hasArg("display")) {
         if(server.arg("display").length() > 0) {
-            Serial.println("Text recieved");
-            update_display();
+            if(newStr != NULL) { //make sure memory is allocated before attempting to free
+                Serial.println("Freeing space of previous display string");
+                free(newStr); //free memory before allocating more
+                newStr = NULL;
+            }
+            newStr = update_display();
         }
+
         update_effect();
     }
 
@@ -83,7 +86,7 @@ void handle_connect() {
 void setup() {
     Serial.begin(115200); //Init serial connection so we can read output in terminal
 
-    static const char *default_text = "~~ Hack The Planet!!!!";
+    const char *default_text = "~~ Hack The Planet!!!!";
     display.begin();
     display.setIntensity(10); // Change brightness from 0 to 15
     display.displayClear();
