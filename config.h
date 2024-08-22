@@ -1,8 +1,23 @@
-enum site_args {
-    UPDATE_DISPLAY,
-    UPDATE_ACTION
-}; 
-
+static const char *code = 
+  "<!DOCTYPE html>"
+  "<html>"
+    "<head><title>CONTROL DISPLAY</title></head>"
+    "<body>"
+      "<div>"
+        "<form action='/' method='post'>"
+            "<p>New Text: </p>"
+            "<input type='text' name='display' placeholder='What would you like to tell the world?'>"
+            "<br>"
+            "<select name='effect'>"
+                "<option value='Effect 1'>" //change to function that will do all these for me
+                "<option value='Effect 2'>" //change to function that will do all these for me
+            "</select>"
+            "<br>"
+            "<input type='submit' value='Change'>"
+        "</form>"
+      "</div>"
+    "</body>"
+  "</html>";
 
 static const int EFFECTS[] = {
     PA_PRINT,
