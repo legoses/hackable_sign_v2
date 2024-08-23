@@ -1,0 +1,8 @@
+#!/bin/bash
+#this compiles and uploads arduino ide sketches in place of the ide
+
+BOARD="esp32:esp32:esp32"
+PORT="/dev/ttyUSB0"
+
+arduino-cli compile -b $BOARD
+arduino-cli upload -b $BOARD -p $PORT

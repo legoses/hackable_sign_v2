@@ -31,30 +31,39 @@ IPAddress subnet(255,255,255,0);
 
 //Configure server to run on port 80, the default port for http
 WebServer server(80);
+int curTime = millis();
+EspClass esp;
 
 void serve_page() {
     server.send(200, "text/html", code);
 }
 
 
-char* update_display() {
+void check_heap() {
+    Serial.print("Heap size: ");
+    Serial.println(esp.getHeapSize());
+    Serial.print("Free heap: ");
+    Serial.println(esp.getFreeHeap());
+    Serial.println();
+}
+
+
+char* update_display(String str) {
     char *newStr;
     display.displayClear(); // Clear the display
 
-    int strLen = server.arg("display").length()+1; //add 1 to include string null terminator
+    int strLen = str.length()+1; //add 1 to include string null terminator
     newStr = (char*)malloc(strLen); //allocate needed memory for string
     Serial.println("Allocating memory for new display string");
-    memcpy(newStr, server.arg("display").c_str(), strLen); //copy string into allocated memory
+    memcpy(newStr, str.c_str(), strLen); //copy string into allocated memory
 
     //display.displayScroll(newStr, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
     return newStr;
 }
 
 
-int update_effect(const char *newStr) {
-    Serial.println("Update effect place holder");
-    Serial.println(newStr);
-    int effectNum = server.arg("effect").toInt();
+int update_effect(String effect) {
+    int effectNum = effect.toInt();
 
     if(effectNum <= MAX_EFFECT) {
         return effectNum;
@@ -73,19 +82,20 @@ void handle_connect() {
     if(!server.authenticate(http_username, http_password)) { //make sure user has logged in with username and password
         return server.requestAuthentication();
     }
-
     if(server.args() > 0) {
         if(server.arg("display").length() > 0) {
             if(newStr != NULL) { //make sure memory is allocated before attempting to free
                 Serial.println("Freeing space of previous display string");
                 free(newStr); //free memory before allocating more
                 newStr = NULL;
+                check_heap();
             }
-            newStr = update_display();
+            newStr = update_display(server.arg("effect"));
+            check_heap();
         }
 
         if(server.arg("effect") != "" && newStr != NULL) {
-            lastEffect = update_effect(newStr);
+            lastEffect = update_effect(server.arg("effect"));
         }
        
         if(newStr != NULL) {
@@ -106,11 +116,12 @@ void handle_connect() {
 void setup() {
     Serial.begin(115200); //Init serial connection so we can read output in terminal
 
-    const char *default_text = "~~ Hack The Planet!!!!";
+    //const char *default_text = "~~ Hack The Planet!!!!";
+    char *displayedText = update_display("~~ Hack The Planet!!!!");
     display.begin();
     display.setIntensity(10); // Change brightness from 0 to 15
     display.displayClear();
-    display.displayScroll(default_text, PA_RIGHT, PA_SCROLL_LEFT, 50);
+    display.displayScroll(displayedText, PA_RIGHT, PA_SCROLL_LEFT, 50);
 
     Serial.println("Configuring Access Point");
     WiFi.mode(WIFI_AP); //Configure ESP to be an access point rather than a client
@@ -119,10 +130,13 @@ void setup() {
         Serial.println("AP config succeeded");
     }
 
+    //void (*connectPtr)(char*) = &handle_connect;
+
     server.on("/", handle_connect); //Run this when a client connects
 
     server.begin(); //Start access point
 }
+
 
 void loop() {
   server.handleClient();
