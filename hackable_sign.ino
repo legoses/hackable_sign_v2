@@ -24,6 +24,7 @@ MD_Parola display = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 static const char *ssid = "ESP32 Acccess Point";
 static const char *http_username = "admin";
 static const char *http_password = "1337";
+const char *default_text = "~~ Hack The Planet!!!!";
 char *displayed_text = NULL;
 
 //Configure networking
@@ -107,7 +108,7 @@ void handle_connect() {
             display.displayScroll(displayed_text, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
         }
         else {
-            display.displayScroll("~~ Hack The Planet!!!!", PA_RIGHT, EFFECTS[lastEffect], 50); //update display
+            display.displayScroll(default_text, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
         }
 
     }
@@ -120,13 +121,11 @@ void handle_connect() {
 void setup() {
     Serial.begin(115200); //Init serial connection so we can read output in terminal
 
-    //const char *default_text = "~~ Hack The Planet!!!!";
-    //char *displayedText = update_display("~~ Hack The Planet!!!!");
-    displayed_text = update_display("~~ Hack The Planet!!!!");
+    displayed_text = update_display(default_text);
     display.begin();
     display.setIntensity(10); // Change brightness from 0 to 15
     display.displayClear();
-    display.displayScroll(displayedText, PA_RIGHT, PA_SCROLL_LEFT, 50);
+    display.displayScroll(displayed_text, PA_RIGHT, PA_SCROLL_LEFT, 50);
 
     Serial.println("Configuring Access Point");
     WiFi.mode(WIFI_AP); //Configure ESP to be an access point rather than a client
