@@ -2,14 +2,23 @@ const int MAX_EFFECT = 30; //keep track of the amount of possible effects
 
 //html that is displayed on webpage
 static const char *code = 
-  "<!DOCTYPE html>"
-  "<html>"
+    "<style>"
+        "body, input, select {"
+        "    font-family: 'Courier New', monospace;"
+        "}"
+    "</style>"
+    "<!DOCTYPE html>"
+    "<html>"
     "<head><title>CONTROL DISPLAY</title></head>"
     "<body>"
       "<div>"
         "<form action='/' method='post'>"
             "<p>New Text: </p>"
-            "<input type='text' name='display' placeholder='What would you like to tell the world?'>"
+            "<input type='text' name='display' placeholder='What would you like to tell the world?' style='width:300px'>"
+            "<br>"
+            "<p>Set Speed: </p>"
+            "<input type='text' name='speed' placeholder='50' style='width:50px'>"
+            "<br>"
             "<br>"
             "<select name='effect'>"
                 "<option value=''>-- Select an effect --</option>"
@@ -50,7 +59,7 @@ static const char *code =
         "</form>"
       "</div>"
     "</body>"
-  "</html>";
+    "</html>";
 
 static textEffect_t EFFECTS[] = {
     PA_NO_EFFECT,
