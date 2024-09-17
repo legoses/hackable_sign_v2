@@ -8,6 +8,7 @@
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
 #define MAX_DEVICES 4
 #define CS_PIN 5
+
 //clk connectes to pin 18
 //din connects to pin 23
 
@@ -23,6 +24,7 @@ MD_Parola display = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 static const char *ssid = "ESP32 Acccess Point";
 static const char *http_username = "admin";
 static const char *http_password = "1337";
+char *displayed_text = NULL;
 
 //Configure networking
 IPAddress local_ip(192,168,4,1);
@@ -76,30 +78,33 @@ void handle_connect() {
     //set to null to signify that memory has not been allocated
     //static keyword means this will keep its value while out of scope
     //this allows memory to be freed in later calls of this function
-    static char *newStr = NULL;
-    static int lastEffect = 17; //default scroll effect
+    //static char *displayed_text = NULL;
+    static int lastEffect = 15; //default scroll left effect
+    Serial.println("Handle connect called");
 
     if(!server.authenticate(http_username, http_password)) { //make sure user has logged in with username and password
         return server.requestAuthentication();
     }
     if(server.args() > 0) {
         if(server.arg("display").length() > 0) {
-            if(newStr != NULL) { //make sure memory is allocated before attempting to free
+            if(displayed_text != NULL) { //make sure memory is allocated before attempting to free
                 Serial.println("Freeing space of previous display string");
-                free(newStr); //free memory before allocating more
-                newStr = NULL;
-                check_heap();
+                free(displayed_text); //free memory before allocating more
+                displayed_text = NULL;
+                //check_heap();
             }
-            newStr = update_display(server.arg("effect"));
-            check_heap();
+            displayed_text = update_display(server.arg("display"));
+            //Serial.print("String recieved: ");
+            //Serial.println(server)
+            //check_heap();
         }
 
-        if(server.arg("effect") != "" && newStr != NULL) {
+        if(server.arg("effect") != "") {
             lastEffect = update_effect(server.arg("effect"));
         }
        
-        if(newStr != NULL) {
-            display.displayScroll(newStr, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
+        if(displayed_text != NULL) {
+            display.displayScroll(displayed_text, PA_RIGHT, EFFECTS[lastEffect], 50); //update display
         }
         else {
             display.displayScroll("~~ Hack The Planet!!!!", PA_RIGHT, EFFECTS[lastEffect], 50); //update display
@@ -109,7 +114,6 @@ void handle_connect() {
 
     Serial.println("Sending webpage");
     serve_page();
-    //server.send(200, "text/html", code);
 }
 
 
@@ -117,7 +121,8 @@ void setup() {
     Serial.begin(115200); //Init serial connection so we can read output in terminal
 
     //const char *default_text = "~~ Hack The Planet!!!!";
-    char *displayedText = update_display("~~ Hack The Planet!!!!");
+    //char *displayedText = update_display("~~ Hack The Planet!!!!");
+    displayed_text = update_display("~~ Hack The Planet!!!!");
     display.begin();
     display.setIntensity(10); // Change brightness from 0 to 15
     display.displayClear();
