@@ -1,7 +1,7 @@
 # Hackable Sign V2
-This electronic sign project uses an ESP8266 broadcasting an SSID. It allows users to connect to the network where they can interact with a web server that allows an authenticated user to change the text on a dot matrix display (MAX7219). Non-authenticated users can attempt to hack the web server to change the text.
+This electronic sign project uses an ESP32 broadcasting an SSID. It allows users to connect to the network where they can interact with a web server that allows an authenticated user to change the text on a dot matrix display (MAX7219). Non-authenticated users can attempt to hack the web server to change the text.
 
-Most of the code used to communicate to the MAX7219 dot matrix display was taken from Micro Controllers Lab https://microcontrollerslab.com/max7219-led-dot-matrix-display-esp8266-nodemcu-tutorial/.
+Most of the code used to communicate to the MAX7219 dot matrix display was taken from Micro Controllers Lab https://microcontrollerslab.com/install-esp32-arduino-ide/.
 
 NOTE: This project is intentionally insecure. It is meant to be hacked. 
 
@@ -33,7 +33,7 @@ Lastly on line 24 you can change the SSID. The default is "ESP32 Access Point".
 ```const char* ssid = "ESP32 Access Point";```
 
 ## Connect MAX7219 to ESP32
-The following table shows how to connect the pins on the MAX7219 display to the ESP8266 using wires. If the ESP8266 has pins pre-sodered you can use the female to female wires that typically come bundled with the MAX7219. 
+The following table shows how to connect the pins on the MAX7219 display to the ESP32 using wires. If the ESP32 has pins pre-sodered you can use the female to female wires that typically come bundled with the MAX7219. 
 ```
 +---------------------+
 |  MAX7219 |  ESP32   |
@@ -51,7 +51,7 @@ The following table shows how to connect the pins on the MAX7219 display to the 
 - [Download and install Arduino IDE 1.x or 2.x](https://www.arduino.cc/en/software)
 - Start Arduino and open the Preferences window 
 - Enter ```https://espressif.github.io/arduino-esp32/package_esp32_index.json``` into the File>Preferences>Additional Boards Manager URLs field of the Arduino IDE. You can add multiple URLs, separating them with commas.
-- Open Boards Manager from Tools > Board menu and install esp32 platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
+- Open Boards Manager from Tools > Board menu and install esp32 platform (and don't forget to select your ESP32 board from Tools > Board menu after installation).
 
 #### Install libraries
 - In Arduino IDE go to Tools>Manage Libraries (CTRL + SHFT + I)
