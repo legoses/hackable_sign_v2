@@ -35,13 +35,13 @@ IPAddress subnet(255,255,255,0);
 //Configure server to run on port 80, the default port for http
 WebServer server(80);
 int curTime = millis();
-EspClass esp;
+EspClass esp; //For testing. Will probably delete later
 
 void serve_page() {
     server.send(200, "text/html", code);
 }
 
-
+//used for testing
 void check_heap() {
     Serial.print("Heap size: ");
     Serial.println(esp.getHeapSize());
@@ -71,6 +71,8 @@ int update_effect(String effect) {
     if(effectNum <= MAX_EFFECT) {
         return effectNum;
     }
+
+    Serial.println("Effect is out of index of array");
     return 17;
 }
 
@@ -80,7 +82,7 @@ void handle_connect() {
     //static keyword means this will keep its value while out of scope
     //this allows memory to be freed in later calls of this function
     //static char *displayed_text = NULL;
-    static int lastEffect = 15; //default scroll left effect
+    static int lastEffect = 16; //default scroll left effect
     Serial.println("Handle connect called");
 
     if(!server.authenticate(http_username, http_password)) { //make sure user has logged in with username and password
@@ -112,7 +114,8 @@ void handle_connect() {
         }
 
     }
-
+    
+    Serial.printf("Default effect: %i. Effect stored in array: %i\n", PA_SCROLL_LEFT, EFFECTS[17]);
     Serial.println("Sending webpage");
     serve_page();
 }
